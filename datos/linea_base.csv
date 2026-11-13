@@ -1,0 +1,8 @@
+variable,movimiento,media,desviacion_estandar,limite_inferior,limite_superior,cv_porcentaje,unidad
+AP,A+ sujecion,447.12,115.0403,102.00,792.24,25.7,ms
+AN,A- liberacion,621.44,35.6149,514.60,728.28,5.7,ms
+BP,B+ estampado,413.08,31.7660,317.78,508.38,7.7,ms
+BN,B- retroceso,558.92,42.7697,430.61,687.23,7.7,ms
+CP,C+ expulsion,383.08,48.2579,238.31,527.85,12.6,ms
+CN,C- resorte,583.96,65.2109,388.33,779.59,11.2,ms
+caudal,linea comun (escala registrada),3.3480,0.7094,1.22,5.48,21.2,L/min
