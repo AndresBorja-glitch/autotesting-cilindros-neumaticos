@@ -1,0 +1,1162 @@
+[
+    {
+        "id": "02895ffcc0f8d95c",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "5859166cfc297893",
+        "type": "modbus-read",
+        "z": "02895ffcc0f8d95c",
+        "name": "COMANDO",
+        "topic": "",
+        "showStatusActivities": false,
+        "logIOActivities": false,
+        "showErrors": false,
+        "showWarnings": true,
+        "unitid": "1",
+        "dataType": "InputRegister",
+        "adr": "0",
+        "quantity": "1",
+        "rate": "1000",
+        "rateUnit": "ms",
+        "delayOnStart": false,
+        "enableDeformedMessages": false,
+        "startDelayTime": "",
+        "server": "6ac9ae416be872d9",
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "x": 530,
+        "y": 600,
+        "wires": [
+            [
+                "c4076c845206c924"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "c4076c845206c924",
+        "type": "debug",
+        "z": "02895ffcc0f8d95c",
+        "name": "debug 2",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 720,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "136a355c758cfc27",
+        "type": "modbus-read",
+        "z": "02895ffcc0f8d95c",
+        "name": "TIEMPOS_CL",
+        "topic": "",
+        "showStatusActivities": false,
+        "logIOActivities": false,
+        "showErrors": false,
+        "showWarnings": true,
+        "unitid": "1",
+        "dataType": "InputRegister",
+        "adr": "1",
+        "quantity": "7",
+        "rate": "1000",
+        "rateUnit": "ms",
+        "delayOnStart": false,
+        "enableDeformedMessages": false,
+        "startDelayTime": "",
+        "server": "6ac9ae416be872d9",
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "x": 550,
+        "y": 780,
+        "wires": [
+            [
+                "11cc886370b4e400",
+                "c44ec78e0fbadff6"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "c44ec78e0fbadff6",
+        "type": "debug",
+        "z": "02895ffcc0f8d95c",
+        "name": "debug 3",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 760,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "11cc886370b4e400",
+        "type": "function",
+        "z": "02895ffcc0f8d95c",
+        "name": "function 1",
+        "func": "\nlet t = msg.payload;\n\nif (!Array.isArray(t) || t.length < 7) {\n    return null;\n}\n\nlet cicloActual = Number(t[6]);\n\nif (!Number.isFinite(cicloActual)) {\n    return null;\n}\n\nlet ultimoCiclo = flow.get(\"ultimoCiclo\");\n\nif (ultimoCiclo === undefined) {\n    flow.set(\"ultimoCiclo\", cicloActual);\n    return null;\n}\n\nif (cicloActual === ultimoCiclo) {\n    return null;\n}\n\nflow.set(\"ultimoCiclo\", cicloActual);\n\n// Obtener la última lectura de caudal guardada por function 3\nlet lecturaCaudal = flow.get(\"ultimaLecturaCaudal\");\n\nlet ciclo = {\n    ciclo: cicloActual,\n    AP: Number(t[0]),\n    AN: Number(t[1]),\n    BP: Number(t[2]),\n    BN: Number(t[3]),\n    CP: Number(t[4]),\n    CN: Number(t[5]),\n    caudal: lecturaCaudal &&\n        Number.isFinite(Number(lecturaCaudal.caudal))\n        ? Number(lecturaCaudal.caudal)\n        : null,\n    fecha: new Date().toISOString()\n};\n\nlet ciclos = flow.get(\"ciclos\") || [];\n\nciclos.push(ciclo);\nflow.set(\"ciclos\", ciclos);\n\n// Preparar el registro de texto\nmsg.payload =\n    \"CICLO: \" + ciclo.ciclo + \"\\n\" +\n    \"-------------------------\\n\" +\n    \"AP: \" + ciclo.AP + \"\\n\" +\n    \"AN: \" + ciclo.AN + \"\\n\" +\n    \"BP: \" + ciclo.BP + \"\\n\" +\n    \"BN: \" + ciclo.BN + \"\\n\" +\n    \"CP: \" + ciclo.CP + \"\\n\" +\n    \"CN: \" + ciclo.CN + \"\\n\" +\n    \"CAUDAL: \" +\n    (ciclo.caudal !== null ? ciclo.caudal : \"SIN LECTURA\") + \"\\n\" +\n    \"FECHA: \" + ciclo.fecha;\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 760,
+        "y": 800,
+        "wires": [
+            [
+                "8e13ded6315a294d",
+                "d31f9e0f5da11a44",
+                "1b93b0d4f0f89c92",
+                "2f556900201acb9e"
+            ]
+        ]
+    },
+    {
+        "id": "8e13ded6315a294d",
+        "type": "debug",
+        "z": "02895ffcc0f8d95c",
+        "name": "debug 4",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 940,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "0386f360249a73eb",
+        "type": "debug",
+        "z": "02895ffcc0f8d95c",
+        "name": "debug 5",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1160,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "d31f9e0f5da11a44",
+        "type": "function",
+        "z": "02895ffcc0f8d95c",
+        "name": "ESTADISTICA",
+        "func": "\nlet ciclos = flow.get(\"ciclos\") || [];\n\nif (ciclos.length === 0) {\n    return null;\n}\n\nconst variables = [\"AP\", \"AN\", \"BP\", \"BN\", \"CP\", \"CN\", \"caudal\"];\n\nlet texto = \"\";\n\ntexto += \"ESTADISTICAS - \" + ciclos.length + \" CICLOS\\n\";\ntexto += \"================================\\n\";\n\nfor (let variable of variables) {\n\n    let valores = ciclos\n        .map(c => Number(c[variable]))\n        .filter(v => Number.isFinite(v));\n\n    if (valores.length === 0) {\n        continue;\n    }\n\n    let n = valores.length;\n\n    let media = valores.reduce(\n        (suma, valor) => suma + valor, 0\n    ) / n;\n\n    let minimo = Math.min(...valores);\n    let maximo = Math.max(...valores);\n\n    let sumaCuadrados = valores.reduce(\n        (suma, valor) => suma + Math.pow(valor - media, 2),\n        0\n    );\n\n    let desviacion = n > 1\n        ? Math.sqrt(sumaCuadrados / (n - 1))\n        : 0;\n\n    texto += variable +\n        \" | MUESTRAS: \" + n +\n        \" | MEDIA: \" + media.toFixed(4) +\n        \" | MIN: \" + minimo.toFixed(4) +\n        \" | MAX: \" + maximo.toFixed(4) +\n        \" | DESV: \" + desviacion.toFixed(4) +\n        \"\\n\";\n}\n\ntexto += \"================================\";\n\nmsg.payload = texto;\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 980,
+        "y": 800,
+        "wires": [
+            [
+                "0386f360249a73eb",
+                "b1e2939bbfb07448"
+            ]
+        ]
+    },
+    {
+        "id": "4533dd7d0944354c",
+        "type": "function",
+        "z": "02895ffcc0f8d95c",
+        "name": "RESET HISTORICO",
+        "func": "flow.set(\"ciclos\", []);\nflow.set(\"ultimoCiclo\", undefined);\n\nmsg.payload = \"Histórico borrado. Node-RED tiene 0 ciclos.\";\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 300,
+        "y": 820,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "dd3c668393d71117",
+        "type": "inject",
+        "z": "02895ffcc0f8d95c",
+        "name": "RESET",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 110,
+        "y": 820,
+        "wires": [
+            [
+                "4533dd7d0944354c"
+            ]
+        ]
+    },
+    {
+        "id": "1b93b0d4f0f89c92",
+        "type": "csv",
+        "z": "02895ffcc0f8d95c",
+        "name": "CSV HISTORICO",
+        "spec": "rfc",
+        "sep": ",",
+        "hdrin": "",
+        "hdrout": "once",
+        "multi": "mult",
+        "ret": "\\r\\n",
+        "temp": "ciclo,AP,AN,BP,BN,CP,CN,caudal,fecha",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": "",
+        "include_null_values": "",
+        "x": 990,
+        "y": 920,
+        "wires": [
+            [
+                "415e4cc68e1e9b64"
+            ]
+        ]
+    },
+    {
+        "id": "415e4cc68e1e9b64",
+        "type": "file",
+        "z": "02895ffcc0f8d95c",
+        "name": "GUARDAR CSV",
+        "filename": "C:\\NodeRED\\historico_ciclos.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "none",
+        "x": 1220,
+        "y": 920,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b1e2939bbfb07448",
+        "type": "function",
+        "z": "02895ffcc0f8d95c",
+        "name": "Z-Score",
+        "func": "\n/* ==========================================\n   Z-SCORE CON REFERENCIAS NOMINALES FIJAS\n   AP, AN, BP, BN, CP, CN y CAUDAL\n\n   Calibración: 25 mediciones nominales\n   Umbral de anomalía: |Z| >= 3\n   Las referencias no cambian en ejecución.\n   ========================================== */\n\n// ------------------------------------------\n// 1. REFERENCIAS NOMINALES FIJAS\n// ------------------------------------------\n\nconst REFERENCIA = {\n    AP:     { media: 447.12,  desviacion: 115.0403 },\n    AN:     { media: 621.44,  desviacion: 35.6149 },\n    BP:     { media: 413.08,  desviacion: 31.7660 },\n    BN:     { media: 558.92,  desviacion: 42.7697 },\n    CP:     { media: 383.08,  desviacion: 48.2579 },\n    CN:     { media: 583.96,  desviacion: 65.2109 },\n    CAUDAL: { media: 3.3480,  desviacion: 0.7094 }\n};\n\nconst VARIABLES = [\"AP\", \"AN\", \"BP\", \"BN\", \"CP\", \"CN\"];\nconst UMBRAL_Z = 3;\n\n// ------------------------------------------\n// 2. OBTENER EL CICLO ACTUAL\n// ------------------------------------------\n\nconst ciclos = flow.get(\"ciclos\") || [];\n\nif (!Array.isArray(ciclos) || ciclos.length === 0) {\n    node.warn(\"Z-Score: no hay ciclos disponibles.\");\n    return null;\n}\n\nconst cicloActual = ciclos[ciclos.length - 1];\n\n// ------------------------------------------\n// 3. CALCULAR Z-SCORE DE LOS SEIS TIEMPOS\n// ------------------------------------------\n\nconst tiempos = {};\nconst zscore = {};\n\nfor (const variable of VARIABLES) {\n    const valorOriginal = cicloActual[variable];\n    const actual = Number(valorOriginal);\n\n    const media = REFERENCIA[variable].media;\n    const desviacion = REFERENCIA[variable].desviacion;\n\n    if (\n        valorOriginal === null ||\n        valorOriginal === undefined ||\n        valorOriginal === \"\" ||\n        !Number.isFinite(actual) ||\n        desviacion <= 0\n    ) {\n        node.warn(\n            \"Z-Score: valor inválido para \" + variable +\n            \" en el ciclo \" + cicloActual.ciclo\n        );\n        return null;\n    }\n\n    const z = (actual - media) / desviacion;\n\n    tiempos[variable] = actual;\n\n    zscore[variable] = {\n        actual: actual,\n        media: media,\n        desviacion: desviacion,\n        zscore: Number(z.toFixed(4)),\n        estado: Math.abs(z) >= UMBRAL_Z\n            ? \"ANOMALIA\"\n            : \"NORMAL\"\n    };\n}\n\n// ------------------------------------------\n// 4. CALCULAR Z-SCORE DEL CAUDAL\n// ------------------------------------------\n\nconst valorOriginalCaudal = cicloActual.caudal;\n\nconst caudalActual =\n    valorOriginalCaudal === null ||\n    valorOriginalCaudal === undefined ||\n    valorOriginalCaudal === \"\"\n        ? NaN\n        : Number(valorOriginalCaudal);\n\nif (!Number.isFinite(caudalActual)) {\n    node.warn(\n        \"Z-Score: caudal inválido en el ciclo \" +\n        cicloActual.ciclo\n    );\n    return null;\n}\n\nconst mediaCaudal = REFERENCIA.CAUDAL.media;\nconst desviacionCaudal = REFERENCIA.CAUDAL.desviacion;\n\nconst zCaudal =\n    (caudalActual - mediaCaudal) / desviacionCaudal;\n\nzscore.caudal = {\n    actual: caudalActual,\n    media: mediaCaudal,\n    desviacion: desviacionCaudal,\n    zscore: Number(zCaudal.toFixed(4)),\n    estado: Math.abs(zCaudal) >= UMBRAL_Z\n        ? \"ANOMALIA\"\n        : \"NORMAL\"\n};\n\n// ------------------------------------------\n// 5. ENTREGAR RESULTADO\n// ------------------------------------------\n\nmsg.payload = {\n    ciclo: cicloActual.ciclo,\n    tiempos: tiempos,\n    zscore: zscore,\n    referenciaFija: true,\n    referenciaCaudal: {\n        media: mediaCaudal,\n        desviacion: desviacionCaudal,\n        muestras: 25,\n        estado: \"Referencia nominal fija\"\n    }\n};\n\n// Guardar Z-Scores para el Dashboard\nflow.set(\"ultimoZScoreDashboard\", zscore);\n\n// Estado visual del nodo\nconst variablesAnomalas = Object.keys(zscore).filter(\n    variable =>\n        Math.abs(zscore[variable].zscore) >= UMBRAL_Z\n);\n\nif (variablesAnomalas.length > 0) {\n    node.status({\n        fill: \"red\",\n        shape: \"dot\",\n        text: \"Anomalía | ciclo \" + cicloActual.ciclo\n    });\n} else {\n    node.status({\n        fill: \"green\",\n        shape: \"dot\",\n        text: \"Ciclo normal | \" + cicloActual.ciclo\n    });\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1180,
+        "y": 720,
+        "wires": [
+            [
+                "5e098d200bc84b7b",
+                "f9a35236fc3db40f",
+                "b5d1145980bd3aed"
+            ]
+        ]
+    },
+    {
+        "id": "e30a144746e09004",
+        "type": "debug",
+        "z": "02895ffcc0f8d95c",
+        "name": "debug 6",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1680,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "5e098d200bc84b7b",
+        "type": "function",
+        "z": "02895ffcc0f8d95c",
+        "name": "DETECCION DE ANOMALIAS",
+        "func": "\nlet datos = msg.payload;\n\n// ==========================================\n// 1. LIMPIAR HISTORIAL CUANDO SE SOLICITE\n// ==========================================\nif (msg.limpiar === true) {\n    flow.set(\"historialAnomalias\", []);\n    flow.set(\"contadorAnomalias\", {\n        AP: 0,\n        AN: 0,\n        BP: 0,\n        BN: 0,\n        CP: 0,\n        CN: 0,\n        caudal: 0\n    });\n\n    flow.set(\"estadoAnomaliaDashboard\", {\n        ciclo: null,\n        estadoGeneral: \"SIN DATOS\",\n        anomalia: false,\n        falla: false,\n        estados: {}\n    });\n\n    node.status({\n        fill: \"green\",\n        shape: \"dot\",\n        text: \"Historial limpiado\"\n    });\n\n    msg.payload = [];\n    return msg;\n}\n\n// ==========================================\n// 2. VALIDAR DATOS RECIBIDOS\n// ==========================================\nif (!datos || typeof datos !== \"object\") {\n    return null;\n}\n\nif (\n    datos.ciclo === null ||\n    datos.ciclo === undefined ||\n    datos.ciclo === \"\"\n) {\n    node.warn(\"Detección: ciclo no válido.\");\n    return null;\n}\n\n// ==========================================\n// 3. CONFIGURACIÓN\n// ==========================================\nconst variables = [\n    \"AP\", \"AN\", \"BP\", \"BN\", \"CP\", \"CN\", \"caudal\"\n];\n\nconst UMBRAL = 3;\nconst LIMITE_FALLA = 3;\nconst MAX_HISTORIAL = 100;\n\nconst identificadorCiclo = String(datos.ciclo);\n\n// ==========================================\n// 4. EVITAR EVALUAR DOS VECES EL MISMO CICLO\n// ==========================================\nconst ultimoCicloEvaluado =\n    flow.get(\"ultimoCicloEvaluadoDeteccion\");\n\nif (ultimoCicloEvaluado === identificadorCiclo) {\n    return null;\n}\n\n// ==========================================\n// 5. RECUPERAR MEMORIA\n// ==========================================\nlet contadores = flow.get(\"contadorAnomalias\") || {};\nlet historial = flow.get(\"historialAnomalias\") || [];\n\nif (!Array.isArray(historial)) {\n    historial = [];\n}\n\nfor (const variable of variables) {\n    if (\n        typeof contadores[variable] !== \"number\" ||\n        !Number.isFinite(contadores[variable])\n    ) {\n        contadores[variable] = 0;\n    }\n}\n\n// ==========================================\n// 6. EVALUAR VARIABLES\n// ==========================================\nlet anomalia = false;\nlet falla = false;\nlet evaluadas = 0;\nlet texto = \"\";\n\nlet estados = {};\n\ntexto += \"CICLO: \" + datos.ciclo + \"\\n\";\ntexto += \"-------------------------\\n\";\n\nfor (const variable of variables) {\n    const dato = datos.zscore\n        ? datos.zscore[variable]\n        : null;\n\n    if (!dato || typeof dato !== \"object\") {\n        estados[variable] = {\n            actual: datos.tiempos\n                ? datos.tiempos[variable] ?? null\n                : null,\n            zscore: null,\n            estado: \"SIN REFERENCIA\",\n            contador: contadores[variable]\n        };\n\n        texto += variable + \": SIN REFERENCIA\\n\";\n        continue;\n    }\n\n    const actual = Number(dato.actual);\n\n    const z =\n        dato.zscore === null ||\n        dato.zscore === undefined ||\n        dato.zscore === \"\"\n            ? NaN\n            : Number(dato.zscore);\n\n    if (!Number.isFinite(z)) {\n        estados[variable] = {\n            actual: Number.isFinite(actual) ? actual : null,\n            zscore: null,\n            estado: \"SIN REFERENCIA\",\n            contador: contadores[variable]\n        };\n\n        texto += variable + \": SIN REFERENCIA\\n\";\n        continue;\n    }\n\n    evaluadas++;\n\n    const esAnomalia = Math.abs(z) >= UMBRAL;\n    let estado;\n\n    if (esAnomalia) {\n        contadores[variable]++;\n        anomalia = true;\n\n        // Evitar duplicar una variable en el mismo ciclo.\n        const yaRegistrada = historial.some(item =>\n            String(item.ciclo) === identificadorCiclo &&\n            item.variable === variable\n        );\n\n        if (!yaRegistrada) {\n            historial.push({\n                ciclo: datos.ciclo,\n                variable: variable,\n                zscore: z,\n                actual: Number.isFinite(actual) ? actual : null\n            });\n        }\n    } else {\n        contadores[variable] = 0;\n    }\n\n    if (contadores[variable] >= LIMITE_FALLA) {\n        estado = \"FALLA\";\n        falla = true;\n    } else if (esAnomalia) {\n        estado = \"ANOMALIA\";\n    } else {\n        estado = \"NORMAL\";\n    }\n\n    estados[variable] = {\n        actual: Number.isFinite(actual) ? actual : null,\n        zscore: z,\n        estado: estado,\n        contador: contadores[variable]\n    };\n\n    texto += variable.toUpperCase() + \": \" +\n        (Number.isFinite(actual) ? actual : \"N/A\") +\n        \" | Z: \" + z.toFixed(2) +\n        \" | \" + estado;\n\n    if (esAnomalia) {\n        texto += \" | CONSECUTIVAS: \" +\n            contadores[variable];\n    }\n\n    texto += \"\\n\";\n}\n\n// ==========================================\n// 7. LIMITAR EL HISTORIAL\n// ==========================================\nif (historial.length > MAX_HISTORIAL) {\n    historial = historial.slice(-MAX_HISTORIAL);\n}\n\n// ==========================================\n// 8. DETERMINAR ESTADO GENERAL\n// ==========================================\nlet estadoGeneral;\n\nif (falla) {\n    estadoGeneral = \"FALLA\";\n} else if (anomalia) {\n    estadoGeneral = \"ANOMALIA DETECTADA\";\n} else if (evaluadas === 0) {\n    estadoGeneral = \"EN EVALUACION\";\n} else {\n    estadoGeneral = \"CICLO NORMAL\";\n}\n\n// ==========================================\n// 9. GUARDAR INFORMACIÓN ACTUALIZADA\n// ==========================================\nflow.set(\"contadorAnomalias\", contadores);\nflow.set(\"historialAnomalias\", historial);\n\nflow.set(\"estadoAnomaliaDashboard\", {\n    ciclo: datos.ciclo,\n    estadoGeneral: estadoGeneral,\n    anomalia: anomalia,\n    falla: falla,\n    estados: estados\n});\n\nflow.set(\n    \"ultimoCicloEvaluadoDeteccion\",\n    identificadorCiclo\n);\n\n// ==========================================\n// 10. ENVIAR RESULTADO\n// ==========================================\ntexto += \"-------------------------\\n\";\ntexto += \"ESTADO: \" + estadoGeneral;\n\nmsg.payload = texto;\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1430,
+        "y": 720,
+        "wires": [
+            [
+                "e30a144746e09004",
+                "3e147b576ab72b1e",
+                "30663a92f7955e06",
+                "a1b2c3d4e5f60001"
+            ]
+        ]
+    },
+    {
+        "id": "2f556900201acb9e",
+        "type": "function",
+        "z": "02895ffcc0f8d95c",
+        "name": "Datos DashBoard",
+        "func": "let ciclo = msg.payload;\n\n// Verificar que recibimos el texto generado por \"function 1\"\nif (typeof ciclo !== \"string\") {\n    return null;\n}\n\nlet lineas = ciclo.split(\"\\n\");\nlet datos = {};\n\nfor (let linea of lineas) {\n\n    let partes = linea.split(\":\");\n\n    if (partes.length < 2) {\n        continue;\n    }\n\n    let clave = partes[0].trim();\n    let valor = partes.slice(1).join(\":\").trim();\n\n    datos[clave] = valor;\n}\n\n// Crear estructura para el Dashboard\nmsg.payload = {\n    ciclo: Number(datos[\"CICLO\"]),\n\n    tiempos: {\n        AP: Number(datos[\"AP\"]),\n        AN: Number(datos[\"AN\"]),\n        BP: Number(datos[\"BP\"]),\n        BN: Number(datos[\"BN\"]),\n        CP: Number(datos[\"CP\"]),\n        CN: Number(datos[\"CN\"])\n    }\n};\n\n// Guardar el último ciclo para utilizarlo después\nflow.set(\"ultimoCicloDashboard\", msg.payload);\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 970,
+        "y": 1020,
+        "wires": [
+            [
+                "d9453ad6afcbf4c1"
+            ]
+        ]
+    },
+    {
+        "id": "d9453ad6afcbf4c1",
+        "type": "debug",
+        "z": "02895ffcc0f8d95c",
+        "name": "debug 7",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1200,
+        "y": 1020,
+        "wires": []
+    },
+    {
+        "id": "3e147b576ab72b1e",
+        "type": "function",
+        "z": "02895ffcc0f8d95c",
+        "name": "UNIR DATOS DASHBOARD",
+        "func": "\nlet ciclo = flow.get(\"ultimoCicloDashboard\");\nlet zscore = flow.get(\"ultimoZScoreDashboard\");\nlet estado = flow.get(\"estadoAnomaliaDashboard\");\n\nlet historialAnomalias = flow.get(\"historialAnomalias\") || [];\nlet lecturaCaudal = flow.get(\"ultimaLecturaCaudal\");\n\n// Sin datos de ciclo, no enviar nada\nif (\n    !ciclo ||\n    ciclo.ciclo === undefined ||\n    ciclo.ciclo === null\n) {\n    return null;\n}\n\n// Evitar duplicados, usando también la fecha si está disponible\nlet identificadorCiclo =\n    String(ciclo.ciclo) + \"|\" + String(ciclo.fecha || \"\");\n\nlet ultimoCicloEnviado =\n    flow.get(\"ultimoCicloEnviadoDashboard\");\n\nif (ultimoCicloEnviado === identificadorCiclo) {\n    return null;\n}\n\nflow.set(\"ultimoCicloEnviadoDashboard\", identificadorCiclo);\n\n// Limpiar el estado general para que no aparezca\n// el mensaje \"dashboard reiniciado\"\nlet estadoGeneral = estado\n    ? estado.estadoGeneral\n    : null;\n\nif (\n    estadoGeneral &&\n    String(estadoGeneral)\n        .toLowerCase()\n        .includes(\"dashboard reiniciado\")\n) {\n    estadoGeneral = \"ESPERANDO DATOS\";\n}\n\n// Datos para el dashboard\nmsg.payload = {\n    ciclo: ciclo.ciclo,\n    fecha: ciclo.fecha || null,\n\n    caudal: {\n        valor:\n            zscore && zscore.caudal\n                ? zscore.caudal.actual\n                : (lecturaCaudal\n                    ? lecturaCaudal.caudal\n                    : null),\n\n        timestamp: lecturaCaudal\n            ? lecturaCaudal.timestamp\n            : null\n    },\n\n    tiempos: ciclo.tiempos\n        ? {\n            AP: ciclo.tiempos.AP,\n            AN: ciclo.tiempos.AN,\n            BP: ciclo.tiempos.BP,\n            BN: ciclo.tiempos.BN,\n            CP: ciclo.tiempos.CP,\n            CN: ciclo.tiempos.CN\n        }\n        : null,\n\n    zscore: zscore\n        ? {\n            AP: zscore.AP,\n            AN: zscore.AN,\n            BP: zscore.BP,\n            BN: zscore.BN,\n            CP: zscore.CP,\n            CN: zscore.CN,\n            caudal: zscore.caudal || null\n        }\n        : null,\n\n    estado: estado\n        ? {\n            ciclo: estado.ciclo,\n            estadoGeneral: estadoGeneral,\n            anomalia: estado.anomalia,\n            falla: estado.falla || false,\n            estados: estado.estados\n        }\n        : {\n            ciclo: ciclo.ciclo,\n            estadoGeneral: \"ESPERANDO DATOS\",\n            anomalia: false,\n            falla: false,\n            estados: {}\n        },\n\n    historialAnomalias: historialAnomalias\n};\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1820,
+        "y": 440,
+        "wires": [
+            [
+                "42e1b31496daa529",
+                "5373d9a82ee7d407",
+                "b9363abe4ba299f4",
+                "5cd7ec6474345cb0",
+                "2dacef2df651cf26",
+                "1021297bb00b35a4"
+            ]
+        ]
+    },
+    {
+        "id": "42e1b31496daa529",
+        "type": "debug",
+        "z": "02895ffcc0f8d95c",
+        "name": "debug 8",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1800,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "30663a92f7955e06",
+        "type": "debug",
+        "z": "02895ffcc0f8d95c",
+        "name": "debug 9",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1660,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "c193a0e46d62049a",
+        "type": "function",
+        "z": "02895ffcc0f8d95c",
+        "name": "function 2",
+        "func": "let word0 = msg.payload[0];\nlet word1 = msg.payload[1];\n\nlet buffer = Buffer.alloc(4);\n\nbuffer.writeUInt16LE(word0, 0);\nbuffer.writeUInt16LE(word1, 2);\n\nlet presion = Number(buffer.readFloatLE(0).toFixed(2));\n\nmsg.payload = presion;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 740,
+        "y": 360,
+        "wires": [
+            [
+                "aaa0f6ddad2dd54e",
+                "e7bb1b8170f5a736"
+            ]
+        ]
+    },
+    {
+        "id": "781082c9d8c10a37",
+        "type": "modbus-read",
+        "z": "02895ffcc0f8d95c",
+        "name": "PRESIÓN",
+        "topic": "",
+        "showStatusActivities": false,
+        "logIOActivities": false,
+        "showErrors": false,
+        "showWarnings": true,
+        "unitid": "2",
+        "dataType": "InputRegister",
+        "adr": "8",
+        "quantity": "2",
+        "rate": "1000",
+        "rateUnit": "ms",
+        "delayOnStart": false,
+        "enableDeformedMessages": false,
+        "startDelayTime": "",
+        "server": "6ac9ae416be872d9",
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "x": 540,
+        "y": 360,
+        "wires": [
+            [
+                "c193a0e46d62049a"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "aaa0f6ddad2dd54e",
+        "type": "debug",
+        "z": "02895ffcc0f8d95c",
+        "name": "debug 10",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 880,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "e7bb1b8170f5a736",
+        "type": "ui-gauge",
+        "z": "02895ffcc0f8d95c",
+        "name": "Presion",
+        "group": "19772e7b2616ce78",
+        "order": 0,
+        "value": "payload",
+        "valueType": "msg",
+        "width": "6",
+        "height": "3",
+        "gtype": "gauge-half",
+        "gstyle": "needle",
+        "title": "Presion",
+        "alwaysShowTitle": false,
+        "floatingTitlePosition": "top-left",
+        "units": "bar",
+        "icon": "",
+        "prefix": "",
+        "suffix": "",
+        "segments": [
+            {
+                "from": "0",
+                "color": "#ff000d",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "7",
+                "color": "#ff0000",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "8",
+                "color": "#11ff00",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "10",
+                "color": "#ff0000",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "11",
+                "color": "#ff0000",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "15",
+                "color": "#ff0000",
+                "text": "",
+                "textType": "label"
+            }
+        ],
+        "min": 0,
+        "max": "15",
+        "sizeThickness": 16,
+        "sizeGap": 4,
+        "sizeKeyThickness": "6",
+        "styleRounded": true,
+        "styleGlow": false,
+        "className": "",
+        "x": 880,
+        "y": 320,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f9a35236fc3db40f",
+        "type": "debug",
+        "z": "02895ffcc0f8d95c",
+        "name": "debug 11",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1320,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "f31b246a4b8c3ba6",
+        "type": "inject",
+        "z": "02895ffcc0f8d95c",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 720,
+        "wires": [
+            [
+                "e6a36fded9a3b0bd"
+            ]
+        ]
+    },
+    {
+        "id": "e6a36fded9a3b0bd",
+        "type": "function",
+        "z": "02895ffcc0f8d95c",
+        "name": "limpiar datos",
+        "func": "\nconst claves = [\n    \"ciclos\",\n    \"referenciaZScore\",\n    \"reinicioReferenciaZScore\",\n    \"ultimoZScoreDashboard\",\n    \"estadoAnomaliaDashboard\",\n    \"contadorAnomalias\",\n    \"historialAnomalias\",\n    \"ultimoCicloDashboard\"\n];\n\nfor (const clave of claves) {\n    flow.set(clave, undefined);\n}\n\nnode.warn(\"Datos de prueba eliminados del contexto de flujo.\");\n\nmsg.payload = {\n    limpieza: true,\n    mensaje: \"Memoria de prueba limpiada\"\n};\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 290,
+        "y": 720,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b5d1145980bd3aed",
+        "type": "csv",
+        "z": "02895ffcc0f8d95c",
+        "name": "Z-Score TR",
+        "spec": "rfc",
+        "sep": ",",
+        "hdrin": "",
+        "hdrout": "once",
+        "multi": "one",
+        "ret": "\\r\\n",
+        "temp": "AP,AN,BP,BN,CP,CN",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": "",
+        "include_null_values": "",
+        "x": 1390,
+        "y": 820,
+        "wires": [
+            [
+                "3eca3a42406294ad"
+            ]
+        ]
+    },
+    {
+        "id": "3eca3a42406294ad",
+        "type": "file",
+        "z": "02895ffcc0f8d95c",
+        "name": "GUARDA Z-SCORE ",
+        "filename": "C:\\NodeRED\\zscore_ciclos.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "none",
+        "x": 1640,
+        "y": 880,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6f3352a4b5c7dbf7",
+        "type": "modbus-read",
+        "z": "02895ffcc0f8d95c",
+        "name": "caudal read",
+        "topic": "",
+        "showStatusActivities": false,
+        "logIOActivities": false,
+        "showErrors": false,
+        "showWarnings": true,
+        "unitid": "2",
+        "dataType": "InputRegister",
+        "adr": "10",
+        "quantity": "2",
+        "rate": "500",
+        "rateUnit": "ms",
+        "delayOnStart": false,
+        "enableDeformedMessages": false,
+        "startDelayTime": "",
+        "server": "6ac9ae416be872d9",
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "x": 1150,
+        "y": 540,
+        "wires": [
+            [
+                "e203ed36b3f2c7be"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "e203ed36b3f2c7be",
+        "type": "function",
+        "z": "02895ffcc0f8d95c",
+        "name": "function 3",
+        "func": "\n // CAUDAL CODESYS - GUARDAR ULTIMA LECTURA\n\nif (!Array.isArray(msg.payload) || msg.payload.length < 2) {\n    node.warn(\"Caudal: faltan las dos palabras\");\n    return null;\n}\n\nconst word0 = Number(msg.payload[0]);\nconst word1 = Number(msg.payload[1]);\n\nif (\n    !Number.isInteger(word0) ||\n    !Number.isInteger(word1) ||\n    word0 < 0 || word0 > 65535 ||\n    word1 < 0 || word1 > 65535\n) {\n    node.warn(\"Caudal: palabras invalidas\");\n    return null;\n}\n\nconst buffer = Buffer.alloc(4);\nbuffer.writeUInt16LE(word0, 0);\nbuffer.writeUInt16LE(word1, 2);\n\nconst caudal = buffer.readFloatLE(0);\n\nif (!Number.isFinite(caudal)) {\n    node.warn(\"Caudal: valor no valido\");\n    return null;\n}\n\nconst lecturaCaudal = {\n    caudal: caudal,\n    timestamp: Date.now(),\n    word0: word0,\n    word1: word1\n};\n\n// Guardar la última lectura para otros nodos\nflow.set(\"ultimaLecturaCaudal\", lecturaCaudal);\n\n// Enviar la lectura al Debug\nmsg.payload = lecturaCaudal;\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1340,
+        "y": 540,
+        "wires": [
+            [
+                "1528224ce440d850",
+                "3e147b576ab72b1e"
+            ]
+        ]
+    },
+    {
+        "id": "1528224ce440d850",
+        "type": "debug",
+        "z": "02895ffcc0f8d95c",
+        "name": "debug 12",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1460,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "5373d9a82ee7d407",
+        "type": "ui-template",
+        "z": "02895ffcc0f8d95c",
+        "group": "364a5bd1339fc16b",
+        "page": "",
+        "ui": "",
+        "name": "Encabezado, ciclo y alertas",
+        "order": 0,
+        "width": "6",
+        "height": "4",
+        "head": "",
+        "format": "\n<template>\n  <div class=\"t1-panel\">\n    <header class=\"t1-titulo\">MONITOREO DE CICLOS</header>\n\n    <section class=\"t1-ciclo\">\n      <div class=\"t1-ciclo-card\">\n        <div class=\"t1-etiqueta\">CICLO ACTUAL</div>\n        <div class=\"t1-numero\">\n          {{ msg?.payload?.ciclo ?? '--' }}\n        </div>\n      </div>\n\n      <div\n        class=\"t1-estado\"\n        :class=\"msg?.payload?.estado?.falla\n          ? 't1-falla'\n          : msg?.payload?.estado?.anomalia\n            ? 't1-anomalia' : 't1-normal'\"\n      >\n        <span class=\"t1-punto\"></span>\n        {{ msg?.payload?.estado?.estadoGeneral ?? 'ESPERANDO DATOS' }}\n      </div>\n    </section>\n\n    <section\n      v-if=\"msg?.payload?.estado?.falla ||\n            msg?.payload?.estado?.anomalia\"\n      class=\"t1-alerta\"\n    >\n      <div class=\"t1-alerta-titulo\">\n        ⚠️\n        {{ msg.payload.estado.falla\n          ? 'ALARMA PERSISTENTE'\n          : 'ANOMALÍA DETECTADA' }}\n      </div>\n\n      <div\n        v-for=\"(estado, variable) in (msg.payload.estado.estados || {})\"\n        :key=\"variable\"\n        v-show=\"estado && (\n          estado.estado === 'FALLA' ||\n          estado.estado === 'ANOMALIA'\n        )\"\n        class=\"t1-alerta-fila\"\n      >\n        <strong>\n          {{ variable === 'caudal' ? 'CAUDAL DE AIRE' : variable }}\n        </strong>\n        <span>{{ estado.estado }}</span>\n        <span v-if=\"estado.contador != null\">\n          Consecutivas: {{ estado.contador }}\n        </span>\n      </div>\n    </section>\n\n    <section v-else class=\"t1-sin-alerta\">\n      <span class=\"t1-punto\"></span>\n      SIN ALERTAS ACTIVAS\n    </section>\n  </div>\n</template>\n\n<style>\n.t1-panel {\n  font-family: Arial, sans-serif;\n  color: #29495e;\n  width: 100%;\n  box-sizing: border-box;\n}\n\n.t1-titulo {\n  background: #29495e;\n  color: white;\n  text-align: center;\n  padding: 14px;\n  font-weight: bold;\n  border-radius: 5px;\n  margin-bottom: 10px;\n}\n\n.t1-ciclo {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 10px;\n  align-items: stretch;\n  margin-bottom: 10px;\n}\n\n.t1-ciclo-card,\n.t1-estado {\n  border: 1px solid #d3e0e9;\n  border-radius: 5px;\n  padding: 12px;\n  background: #f1f6fa;\n  box-sizing: border-box;\n}\n\n.t1-etiqueta {\n  font-size: 12px;\n  color: #557083;\n  font-weight: bold;\n}\n\n.t1-numero {\n  font-size: 30px;\n  font-weight: bold;\n  margin-top: 4px;\n}\n\n.t1-estado {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  gap: 7px;\n  font-weight: bold;\n  font-size: 12px;\n  text-align: center;\n}\n\n.t1-punto {\n  display: inline-block;\n  width: 9px;\n  height: 9px;\n  border-radius: 50%;\n  background: #35a653;\n  flex-shrink: 0;\n}\n\n.t1-normal,\n.t1-sin-alerta {\n  background: #eaf7ed;\n  border-color: #9ed9aa;\n  color: #27843c;\n}\n\n.t1-anomalia {\n  background: #fff5d8;\n  border-color: #e9c65f;\n  color: #916900;\n}\n\n.t1-falla {\n  background: #fdeaea;\n  border-color: #e99b9b;\n  color: #b71c1c;\n}\n\n.t1-falla .t1-punto,\n.t1-anomalia .t1-punto {\n  background: #d83232;\n}\n\n.t1-alerta {\n  border: 2px solid #c62828;\n  background: #fff0f0;\n  color: #a71919;\n  border-radius: 5px;\n  padding: 12px;\n  margin-bottom: 10px;\n}\n\n.t1-alerta-titulo {\n  font-size: 17px;\n  font-weight: bold;\n  margin-bottom: 8px;\n}\n\n.t1-alerta-fila {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 8px 14px;\n  padding: 7px 0;\n  border-top: 1px solid #efb6b6;\n  font-size: 12px;\n}\n\n.t1-sin-alerta {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  gap: 8px;\n  padding: 10px;\n  border: 1px solid #9ed9aa;\n  border-radius: 5px;\n  font-size: 12px;\n  font-weight: bold;\n}\n\n@media (max-width: 480px) {\n  .t1-ciclo {\n    grid-template-columns: 1fr;\n  }\n}\n</style>\n",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 2200,
+        "y": 260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b9363abe4ba299f4",
+        "type": "ui-template",
+        "z": "02895ffcc0f8d95c",
+        "group": "364a5bd1339fc16b",
+        "page": "",
+        "ui": "",
+        "name": "Tiempos del ciclo",
+        "order": 0,
+        "width": "6",
+        "height": "7",
+        "head": "",
+        "format": "<template>\n  <div class=\"t2-panel\">\n    <h3 class=\"t2-titulo\">TIEMPOS DEL CICLO</h3>\n\n    <div class=\"t2-grid\">\n      <div\n        v-for=\"item in [\n          {key:'AP', label:'A+'},\n          {key:'AN', label:'A−'},\n          {key:'BP', label:'B+'},\n          {key:'BN', label:'B−'},\n          {key:'CP', label:'C+'},\n          {key:'CN', label:'C−'}\n        ]\"\n        :key=\"item.key\"\n        class=\"t2-card\"\n        :class=\"msg?.payload?.estado?.estados?.[item.key]?.estado &&\n          msg.payload.estado.estados[item.key].estado !== 'NORMAL'\n          ? 't2-alerta' : ''\"\n      >\n        <div class=\"t2-top\">\n          <strong>{{ item.label }}</strong>\n          <span\n            class=\"t2-punto\"\n            :class=\"msg?.payload?.estado?.estados?.[item.key]?.estado &&\n              msg.payload.estado.estados[item.key].estado !== 'NORMAL'\n              ? 't2-rojo' : 't2-verde'\"\n          ></span>\n        </div>\n\n        <div class=\"t2-valor\">\n          {{ msg?.payload?.tiempos?.[item.key] ?? '--' }}\n        </div>\n        <div class=\"t2-unidad\">ms</div>\n\n        <div\n          v-if=\"msg?.payload?.estado?.estados?.[item.key]?.estado &&\n            msg.payload.estado.estados[item.key].estado !== 'NORMAL'\"\n          class=\"t2-texto-alerta\"\n        >\n          {{ msg.payload.estado.estados[item.key].estado }}\n        </div>\n      </div>\n    </div>\n  </div>\n</template>\n\n<style>\n.t2-panel {\n  font-family: Arial, sans-serif;\n  color: #29495e;\n}\n.t2-titulo {\n  margin: 0 0 10px;\n  background: #35576b;\n  color: white;\n  padding: 10px;\n  font-size: 13px;\n  border-radius: 4px;\n}\n.t2-grid {\n  display: grid;\n  grid-template-columns: repeat(2, minmax(0, 1fr));\n  gap: 8px;\n}\n.t2-card {\n  padding: 12px;\n  border: 1px solid #d3e0e9;\n  border-radius: 5px;\n  background: #f7f9fb;\n}\n.t2-top {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n}\n.t2-punto {\n  width: 9px;\n  height: 9px;\n  display: inline-block;\n  border-radius: 50%;\n}\n.t2-verde { background: #35a653; }\n.t2-rojo { background: #d83232; }\n.t2-valor {\n  font-size: 23px;\n  font-weight: bold;\n  margin-top: 8px;\n}\n.t2-unidad {\n  font-size: 11px;\n  color: #637b8c;\n}\n.t2-alerta {\n  border: 2px solid #df6666;\n  background: #fff0f0;\n  color: #b71c1c;\n}\n.t2-texto-alerta {\n  margin-top: 6px;\n  font-size: 11px;\n  font-weight: bold;\n}\n@media (max-width: 420px) {\n  .t2-grid { grid-template-columns: 1fr; }\n}\n</style>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 2170,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5cd7ec6474345cb0",
+        "type": "ui-template",
+        "z": "02895ffcc0f8d95c",
+        "group": "19772e7b2616ce78",
+        "page": "",
+        "ui": "",
+        "name": "Z-scores",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "head": "",
+        "format": "<template>\n  <div class=\"t3-panel\">\n    <h3 class=\"t3-titulo\">Z-SCORE</h3>\n\n    <div class=\"t3-grid\">\n      <div\n        v-for=\"item in [\n          {key:'AP', label:'A+'},\n          {key:'AN', label:'A−'},\n          {key:'BP', label:'B+'},\n          {key:'BN', label:'B−'},\n          {key:'CP', label:'C+'},\n          {key:'CN', label:'C−'},\n          {key:'caudal', label:'CAUDAL DE AIRE'}\n        ]\"\n        :key=\"item.key\"\n        class=\"t3-card\"\n        :class=\"msg?.payload?.estado?.estados?.[item.key]?.estado &&\n          msg.payload.estado.estados[item.key].estado !== 'NORMAL'\n          ? 't3-alerta' : ''\"\n      >\n        <strong>{{ item.label }}</strong>\n        <span class=\"t3-valor\">\n          {{ msg?.payload?.zscore?.[item.key]?.zscore ?? '--' }}\n        </span>\n        <small\n          v-if=\"msg?.payload?.estado?.estados?.[item.key]?.estado &&\n            msg.payload.estado.estados[item.key].estado !== 'NORMAL'\"\n        >\n          {{ msg.payload.estado.estados[item.key].estado }}\n        </small>\n      </div>\n    </div>\n  </div>\n</template>\n\n<style>\n.t3-panel {\n  font-family: Arial, sans-serif;\n  color: #29495e;\n}\n.t3-titulo {\n  margin: 0 0 10px;\n  background: #35576b;\n  color: white;\n  padding: 10px;\n  font-size: 13px;\n  border-radius: 4px;\n}\n.t3-grid {\n  display: grid;\n  grid-template-columns: repeat(2, minmax(0, 1fr));\n  gap: 7px;\n}\n.t3-card {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  gap: 8px;\n  flex-wrap: wrap;\n  padding: 10px;\n  border: 1px solid #d3e0e9;\n  border-radius: 4px;\n  background: #f7f9fb;\n  font-size: 12px;\n}\n.t3-valor {\n  font-weight: bold;\n  overflow-wrap: anywhere;\n}\n.t3-card small {\n  width: 100%;\n  color: #b71c1c;\n  font-weight: bold;\n}\n.t3-alerta {\n  border: 2px solid #df6666;\n  background: #fff0f0;\n  color: #b71c1c;\n}\n@media (max-width: 420px) {\n  .t3-grid { grid-template-columns: 1fr; }\n}\n</style>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 2140,
+        "y": 340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2dacef2df651cf26",
+        "type": "ui-template",
+        "z": "02895ffcc0f8d95c",
+        "group": "c73e0ac18590056f",
+        "page": "",
+        "ui": "",
+        "name": "Historial de anomalías",
+        "order": 0,
+        "width": "6",
+        "height": "15",
+        "head": "",
+        "format": "<template>\n  <div class=\"t4-panel\">\n    <h3 class=\"t4-titulo\">HISTORIAL DE ANOMALÍAS</h3>\n\n    <div class=\"t4-tabla-wrap\">\n      <table class=\"t4-tabla\">\n        <thead>\n          <tr>\n            <th>CICLO</th>\n            <th>VARIABLE</th>\n            <th>Z-SCORE</th>\n            <th>VALOR</th>\n            <th>UNIDAD</th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr\n            v-for=\"(a, i) in (msg?.payload?.historialAnomalias || [])\"\n            :key=\"i\"\n          >\n            <td>{{ a.ciclo ?? '--' }}</td>\n            <td class=\"t4-rojo\">{{ a.variable ?? '--' }}</td>\n            <td class=\"t4-rojo\">\n              {{ Number(a.zscore).toFixed(2) }}\n            </td>\n            <td>{{ a.actual ?? '--' }}</td>\n            <td>\n              {{ String(a.variable || '').toLowerCase().includes('caudal')\n                ? 'L/min' : 'ms' }}\n            </td>\n          </tr>\n\n          <tr v-if=\"!(msg?.payload?.historialAnomalias || []).length\">\n            <td colspan=\"5\" class=\"t4-vacio\">\n              NO HAY ANOMALÍAS REGISTRADAS\n            </td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n  </div>\n</template>\n\n<style>\n.t4-panel {\n  font-family: Arial, sans-serif;\n  color: #29495e;\n  width: 100%;\n}\n.t4-titulo {\n  margin: 0 0 8px;\n  background: #35576b;\n  color: white;\n  padding: 10px;\n  font-size: 13px;\n  border-radius: 4px;\n}\n.t4-tabla-wrap {\n  width: 100%;\n  overflow-x: auto;\n}\n.t4-tabla {\n  width: 100%;\n  border-collapse: collapse;\n  font-size: 11px;\n}\n.t4-tabla th {\n  background: #35576b;\n  color: white;\n  padding: 8px 5px;\n}\n.t4-tabla td {\n  border-bottom: 1px solid #d7e1e8;\n  padding: 8px 5px;\n  text-align: center;\n}\n.t4-tabla tbody tr:nth-child(even) {\n  background: #f2f6f9;\n}\n.t4-rojo {\n  color: #d32f2f;\n  font-weight: bold;\n}\n.t4-vacio {\n  padding: 16px !important;\n  color: #627888;\n  text-align: center;\n}\n</style>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 2180,
+        "y": 380,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1021297bb00b35a4",
+        "type": "ui-template",
+        "z": "02895ffcc0f8d95c",
+        "group": "19772e7b2616ce78",
+        "page": "",
+        "ui": "",
+        "name": "Caudal de aire",
+        "order": 0,
+        "width": "6",
+        "height": "5",
+        "head": "",
+        "format": "<template>\n  <div class=\"t5-panel\">\n    <h3 class=\"t5-titulo\">CAUDAL DE AIRE</h3>\n\n    <div class=\"t5-medidor\">\n      <div class=\"t5-icono\">≋</div>\n\n      <div class=\"t5-valor\">\n        {{ msg?.payload?.caudal?.valor != null\n          ? Number(msg.payload.caudal.valor).toFixed(2)\n          : '--' }}\n      </div>\n\n      <div class=\"t5-unidad\">L/min</div>\n    </div>\n\n    <div\n      class=\"t5-estado\"\n      :class=\"t5Alerta ? 't5-estado-alerta' : 't5-estado-normal'\"\n    >\n      <span class=\"t5-punto\"></span>\n      {{ t5Alerta ? '¡ANOMALÍA EN CAUDAL!' : 'LECTURA DE CAUDAL' }}\n    </div>\n\n    <div v-if=\"t5Alerta\" class=\"t5-detalle\">\n      Revisa el caudal de aire. El detector ha marcado esta variable\n      como anómala o en falla.\n    </div>\n  </div>\n</template>\n\n<script>\nexport default {\n  computed: {\n    t5Alerta() {\n      const estado = this.msg?.payload?.estado?.estados?.caudal?.estado;\n      return estado === 'ANOMALIA' || estado === 'FALLA';\n    }\n  }\n}\n</script>\n\n<style>\n.t5-panel {\n  font-family: Arial, sans-serif;\n  color: #29495e;\n  width: 100%;\n}\n.t5-titulo {\n  margin: 0 0 10px;\n  background: #35576b;\n  color: white;\n  padding: 10px;\n  font-size: 13px;\n  border-radius: 4px;\n}\n.t5-medidor {\n  background: #e4f9fd;\n  border: 1px solid #76dced;\n  border-radius: 5px;\n  text-align: center;\n  padding: 22px 10px;\n}\n.t5-icono {\n  font-size: 42px;\n  line-height: 1;\n  color: #079fc0;\n}\n.t5-valor {\n  font-size: 38px;\n  font-weight: bold;\n  color: #079fc0;\n  margin-top: 8px;\n}\n.t5-unidad {\n  color: #079fc0;\n  font-size: 18px;\n  font-weight: bold;\n}\n.t5-estado {\n  margin-top: 10px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  gap: 8px;\n  padding: 11px;\n  border: 1px solid;\n  border-radius: 5px;\n  font-size: 12px;\n  font-weight: bold;\n}\n.t5-estado-normal {\n  background: #eaf7ed;\n  border-color: #9ed9aa;\n  color: #27843c;\n}\n.t5-estado-alerta {\n  background: #fdeaea;\n  border-color: #e99b9b;\n  color: #b71c1c;\n}\n.t5-punto {\n  width: 9px;\n  height: 9px;\n  border-radius: 50%;\n  background: #35a653;\n}\n.t5-estado-alerta .t5-punto {\n  background: #d83232;\n}\n.t5-detalle {\n  margin-top: 8px;\n  padding: 10px;\n  background: #fff0f0;\n  color: #b71c1c;\n  border-radius: 5px;\n  font-size: 12px;\n}\n</style>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 2160,
+        "y": 420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e680a07833190a25",
+        "type": "ui-button",
+        "z": "02895ffcc0f8d95c",
+        "group": "364a5bd1339fc16b",
+        "name": "Limpiar Dashboard",
+        "label": "Limpiar Dashboard",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "emulateClick": false,
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "iconPosition": "left",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "buttonColor": "",
+        "textColor": "",
+        "iconColor": "",
+        "enableClick": true,
+        "enablePointerdown": false,
+        "pointerdownPayload": "",
+        "pointerdownPayloadType": "str",
+        "enablePointerup": false,
+        "pointerupPayload": "",
+        "pointerupPayloadType": "str",
+        "x": 1430,
+        "y": 280,
+        "wires": [
+            [
+                "fafa22aca151143e"
+            ]
+        ]
+    },
+    {
+        "id": "fafa22aca151143e",
+        "type": "function",
+        "z": "02895ffcc0f8d95c",
+        "name": "function 4",
+        "func": "\n/* =========================================\n   LIMPIAR DASHBOARD E HISTORIAL DE ANOMALIAS\n   ========================================= */\n\n// 1. Limpiar historiales\nflow.set(\"historialCaudal\", []);\nflow.set(\"historialPresion\", []);\nflow.set(\"historialTiempo\", []);\nflow.set(\"historialAnomalias\", []);\n\n// 2. Reiniciar contador y acumuladores\nflow.set(\"contadorMuestras\", 0);\nflow.set(\"sumaCaudal\", 0);\nflow.set(\"sumaPresion\", 0);\nflow.set(\"sumaTiempo\", 0);\n\n// 3. Reiniciar contadores de anomalías consecutivas\nflow.set(\"contadorAnomalias\", {\n    AP: 0,\n    AN: 0,\n    BP: 0,\n    BN: 0,\n    CP: 0,\n    CN: 0,\n    caudal: 0\n});\n\n// 4. Limpiar estado general de anomalías\nflow.set(\"estadoAnomaliaDashboard\", {\n    ciclo: null,\n    estadoGeneral: \"SIN DATOS\",\n    anomalia: false,\n    falla: false,\n    estados: {}\n});\n\n// 5. Enviar señal de limpieza a los nodos del dashboard\nmsg.limpiar = true;\nmsg.payload = [];\n\nnode.status({\n    fill: \"green\",\n    shape: \"dot\",\n    text: \"Historial y acumuladores limpiados\"\n});\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1620,
+        "y": 280,
+        "wires": [
+            [
+                "5373d9a82ee7d407",
+                "b9363abe4ba299f4",
+                "5cd7ec6474345cb0",
+                "2dacef2df651cf26",
+                "1021297bb00b35a4",
+                "5e098d200bc84b7b"
+            ]
+        ]
+    },
+    {
+        "id": "6ac9ae416be872d9",
+        "type": "modbus-client",
+        "name": "U",
+        "clienttype": "tcp",
+        "bufferCommands": true,
+        "stateLogEnabled": false,
+        "queueLogEnabled": false,
+        "failureLogEnabled": true,
+        "tcpHost": "10.20.64.7",
+        "tcpPort": 502,
+        "tcpType": "DEFAULT",
+        "serialPort": "/dev/ttyUSB",
+        "serialType": "RTU-BUFFERD",
+        "serialBaudrate": 9600,
+        "serialDatabits": 8,
+        "serialStopbits": 1,
+        "serialParity": "none",
+        "serialConnectionDelay": 100,
+        "serialAsciiResponseStartDelimiter": "0x3A",
+        "unit_id": 1,
+        "commandDelay": 1,
+        "clientTimeout": 1000,
+        "reconnectOnTimeout": true,
+        "reconnectTimeout": 2000,
+        "parallelUnitIdsAllowed": true,
+        "showErrors": false,
+        "showWarnings": true,
+        "showLogs": true
+    },
+    {
+        "id": "19772e7b2616ce78",
+        "type": "ui-group",
+        "name": "PRESION",
+        "page": "adfd1d84408ddd2a",
+        "width": 6,
+        "height": 1,
+        "order": -1,
+        "showTitle": true,
+        "className": "",
+        "visible": true,
+        "disabled": false,
+        "groupType": "default"
+    },
+    {
+        "id": "364a5bd1339fc16b",
+        "type": "ui-group",
+        "name": "HMI",
+        "page": "adfd1d84408ddd2a",
+        "width": 6,
+        "height": 1,
+        "order": -1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "c73e0ac18590056f",
+        "type": "ui-group",
+        "name": "Group Name",
+        "page": "1ae2d712634625e1",
+        "width": "12",
+        "height": 1,
+        "order": -1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "adfd1d84408ddd2a",
+        "type": "ui-page",
+        "name": "HMI",
+        "ui": "fc27a9920245388d",
+        "path": "/presion-caudal",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "504a0767811eea1f",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": -1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "1ae2d712634625e1",
+        "type": "ui-page",
+        "name": "HISTORIAL",
+        "ui": "fc27a9920245388d",
+        "path": "/page3",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "504a0767811eea1f",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": -1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "fc27a9920245388d",
+        "type": "ui-base",
+        "name": "UI Name",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": true
+    },
+    {
+        "id": "504a0767811eea1f",
+        "type": "ui-theme",
+        "name": "Default Theme",
+        "colors": {
+            "surface": "#fcfcfd",
+            "primary": "#0d74ce",
+            "bgPage": "#f9f9fb",
+            "groupBg": "#ffffff",
+            "groupOutline": "#d9d9e0"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "bb12734f0b07f898",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-contrib-modbus": "5.60.2",
+            "@flowfuse/node-red-dashboard": "1.32.0"
+        }
+    },
+    {
+        "id": "a1b2c3d4e5f60001",
+        "type": "function",
+        "z": "02895ffcc0f8d95c",
+        "name": "REGISTRO CSV PRUEBAS",
+        "func": "// REGISTRO TABULAR DE PRUEBAS (una fila por ciclo evaluado)\nif (msg.limpiar === true) { return null; }\n\nconst est = flow.get(\"estadoAnomaliaDashboard\");\nif (!est || est.ciclo === null || est.ciclo === undefined) { return null; }\n\nconst vars = [\"AP\", \"AN\", \"BP\", \"BN\", \"CP\", \"CN\", \"caudal\"];\nconst e = est.estados || {};\nconst f = (v) => (v === null || v === undefined || !Number.isFinite(Number(v))) ? \"\" : Number(v);\n\nlet fila = [new Date().toISOString(), est.ciclo];\nfor (const v of vars) fila.push(f(e[v] ? e[v].actual : null));\nfor (const v of vars) fila.push(f(e[v] ? e[v].zscore : null));\nfor (const v of vars) fila.push(e[v] ? e[v].estado : \"\");\nfila.push(est.estadoGeneral);\n\nlet lineas = [];\nif (!flow.get(\"registroCabeceraEscrita\")) {\n    let cab = [\"fecha\", \"ciclo\"];\n    for (const v of vars) cab.push(v);\n    for (const v of vars) cab.push(\"z_\" + v);\n    for (const v of vars) cab.push(\"estado_\" + v);\n    cab.push(\"estado_general\");\n    lineas.push(cab.join(\",\"));\n    flow.set(\"registroCabeceraEscrita\", true);\n}\nlineas.push(fila.join(\",\"));\n\nmsg.payload = lineas.join(\"\\n\");\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1690,
+        "y": 840,
+        "wires": [
+            [
+                "a1b2c3d4e5f60002"
+            ]
+        ]
+    },
+    {
+        "id": "a1b2c3d4e5f60002",
+        "type": "file",
+        "z": "02895ffcc0f8d95c",
+        "name": "GUARDAR REGISTRO PRUEBAS",
+        "filename": "C:\\NodeRED\\registro_pruebas.csv",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "none",
+        "x": 1950,
+        "y": 840,
+        "wires": []
+    }
+]
