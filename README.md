@@ -70,6 +70,15 @@ Sensibilidad 78,7 % (obstrucciones 93,8 %, fugas 63,6 %) y especificidad 100 %. 
 - **Escala del caudal:** el caudalímetro de FluidSIM está configurado de 0 a 1000 L/min, pero `SENSOR_C` escala de 0 a 100. El caudal registrado es la décima parte del simulado. La puntuación Z no cambia. Corrección: factor 1000 en `SENSOR_C` y referencia ×10 en «Z-Score».
 - **Pendiente:** ejecutar en FluidSIM el protocolo del Anexo B para obtener la matriz de confusión con datos del modelo.
 
+## 🤖 Uso de inteligencia artificial
+Con autorización del docente, usamos **Claude** (asistente de IA de Anthropic) como herramienta de apoyo en:
+- La organización de este repositorio, el README y las guías de la carpeta `temas/`.
+- La revisión, corrección de estilo y ajuste del documento a 50 páginas y a las normas APA.
+- La revisión del flujo de Node-RED (corrección de detalles y nodo de registro CSV) y del cálculo de indicadores.
+- La programación de la simulación Monte Carlo que evalúa la regla de detección.
+
+El diseño del circuito en FluidSIM, la programación del PLC en CODESYS, el flujo de Node-RED, las pruebas en el modelo, los datos de la línea base y las decisiones del proyecto son de los autores, que revisaron todo el contenido.
+
 ## Estado
 - ✅ Modelo digital de tres capas y verificación funcional con obstrucciones inducidas.
 - ✅ Evaluación de la regla de decisión mediante simulación Monte Carlo.
